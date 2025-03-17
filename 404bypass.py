@@ -10,12 +10,18 @@ if len(sys.argv) < 2:
 
 domains = sys.argv[1:]  # Get domains from command-line arguments
 
-# Define extensions to filter
+# Define extensions to filter (Updated)
 extensions = [
     "xls", "xml", "xlsx", "json", "pdf", "sql", "doc", "docx", "pptx", "txt",
     "zip", "tar.gz", "tgz", "bak", "7z", "rar", "log", "cache", "secret", "db",
     "backup", "yml", "gz", "config", "csv", "yaml", "md", "md5", "exe", "tar",
-    "key", "crt", "pub"
+    "key", "crt", "pub", "env", "pem", "ppk", "kdb", "kdbx", "cert", "ovpn",
+    "sqlite", "sqlite3", "db3", "sqlitedb", "ini", "conf", "ps1", "sh", "bat",
+    "cmd", "dockercfg", "dockerfile", "kubeconfig", "k8s", "tfvars", "out",
+    "dump", "core", "pcap", "pcapng", "log.1", "log.2", "log.old", "bak.old",
+    "sql.old", "wallet", "dat", "keychain", "keystore", "pyc", "pyo", "class",
+    "jar", "rb", "php", "asp", "jsp", "cgi", "csproj", "vbproj", "fsproj",
+    "swp", "swo", "backup", "bak2", "old", "bson", "mongodump"
 ]
 
 for domain in domains:
