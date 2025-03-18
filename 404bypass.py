@@ -24,8 +24,16 @@ extensions = [
     "swp", "swo", "backup", "bak2", "old", "bson", "mongodump"
 ]
 
+# Create a single output folder for all domains
+output_folder = "sorted_urls"
+os.makedirs(output_folder, exist_ok=True)
+
+# Dictionary to store found URLs for each extension
+found_urls = {ext: [] for ext in extensions}
+all_urls = []
+
 for domain in domains:
-    output_file = f"out_{domain}.txt"
+    temp_file = f"temp_{domain}.txt"
 
     # Fetch URLs using Wayback Machine
     print(f"🔍 Fetching URLs from Wayback Machine for {domain}...")
@@ -37,25 +45,17 @@ for domain in domains:
         "--data-urlencode", "fl=original"
     ]
 
-    with open(output_file, "w") as f:
+    with open(temp_file, "w") as f:
         subprocess.run(wayback_cmd, stdout=f)
-
-    print(f"✅ Wayback URLs saved to {output_file}")
-
-    # Create Output Folder for the domain
-    output_folder = f"sorted_urls_{domain}"
-    os.makedirs(output_folder, exist_ok=True)
 
     # Read the wayback output file
     try:
-        with open(output_file, "r") as f:
-            urls = [url.strip() for url in f.readlines()]
+        with open(temp_file, "r") as f:
+            urls = [url.strip() for url in f.readlines() if url.strip()]
+            all_urls.extend(urls)  # Collect all URLs
     except FileNotFoundError:
-        print(f"❌ Error: File '{output_file}' not found.")
+        print(f"❌ Error: File '{temp_file}' not found.")
         continue
-
-    # Dictionary to store found URLs for each extension
-    found_urls = {ext: [] for ext in extensions}
 
     # Process URLs and group them by extension
     for url in urls:
@@ -63,11 +63,19 @@ for domain in domains:
             if re.search(rf"\.{ext}\b", url, re.IGNORECASE):
                 found_urls[ext].append(url)
 
-    # Write only non-empty extension files
-    for ext, url_list in found_urls.items():
-        if url_list:  # Only create file if URLs exist for this extension
-            ext_file = os.path.join(output_folder, f"{ext}.txt")
-            with open(ext_file, "w") as f:
-                f.write("\n".join(url_list) + "\n")
+    # Remove temporary file
+    os.remove(temp_file)
 
-    print(f"✅ URLs sorted successfully inside '{output_folder}/' for {domain} (Only found extensions).")
+# Write all URLs in a single file
+out_file = os.path.join(output_folder, "out.txt")
+with open(out_file, "w") as f:
+    f.write("\n".join(all_urls) + "\n")
+
+# Write only non-empty extension files
+for ext, url_list in found_urls.items():
+    if url_list:  # Only create file if URLs exist for this extension
+        ext_file = os.path.join(output_folder, f"{ext}.txt")
+        with open(ext_file, "w") as f:
+            f.write("\n".join(url_list) + "\n")
+
+print(f"✅ URLs sorted successfully inside '{output_folder}/' (Only found extensions).")
