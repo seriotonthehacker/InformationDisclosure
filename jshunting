@@ -1,0 +1,28 @@
+ One-Liner Command to Extract All .js Files from Subdomains using Multiple Tools
+
+cat subdomains.txt | gau --subs | hakrawler -plain | waybackurls | katana -silent | grep "\.js" | sort -u > js_files.txt
+
+
+Extract Sensitive Data from JavaScript Files
+
+cat js_files.txt | xargs -P10 -I{} curl -s {} | gf apikeys | tee sensitive_data.txt
+
+cat js_files.txt | xargs -P10 -I{} curl -s {} | grep -Eo "(api_key|apikey|secret|token|auth|password|key|client_id|client_secret|access_token|bearer)=[\"'][a-zA-Z0-9_-]+[\"']" | tee sensitive_data.txt
+
+
+Using Ripgrep (Faster than grep)
+
+rg -I --no-filename -e "api_key|apikey|secret|token|auth|password|client_id|client_secret|access_token" -r '$1=[REDACTED]' js_files.txt | tee sensitive_data.txt
+
+
+One-Liner Using Nuclei
+
+nuclei -list js_files.txt -t http/exposures/apis/ -o nuclei_js_sensitive.txt
+nuclei -list js_files.txt -t http/exposures/ -o nuclei_sensitive_js.txt
+
+
+Running All Nuclei Templates for JavaScript Files
+nuclei -list js_files.txt -t cves/ -t exposures/ -t misconfiguration/ -o full_scan_results.txt
+
+
+
