@@ -1,0 +1,14 @@
+Subdomain Enumaration
+
+One-Liner for Comprehensive Subdomain Enumeration
+
+subfinder -d evil.com | tee subdomains.txt && amass enum -passive -d evil.com | tee -a subdomains.txt && curl -s "https://crt.sh/?q=%25.evil.com&output=json" | jq -r '.[].name_value' | tee -a subdomains.txt && sort -u subdomains.txt -o final_subdomains.txt
+
+1️⃣ subfinder -d evil.com → Fast passive enumeration
+2️⃣ amass enum -passive -d evil.com → More passive subdomains
+3️⃣ curl -s "https://crt.sh/?q=%25.evil.com&output=json" | jq -r '.[].name_value' → SSL CT Logs થી subdomains
+4️⃣ sort -u subdomains.txt -o final_subdomains.txt → Duplicate Remove & Clean Output
+
+Optimized One-Liner (Without Repeating Domain)
+
+domain="evil.com" && subfinder -d $domain | tee subdomains.txt && amass enum -passive -d $domain | tee -a subdomains.txt && curl -s "https://crt.sh/?q=%25.$domain&output=json" | jq -r '.[].name_value' | tee -a subdomains.txt && sort -u subdomains.txt -o final_subdomains.txt
