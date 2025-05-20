@@ -22,13 +22,9 @@ echo "[+] Querying crt.sh..."
 curl -s "https://crt.sh/?q=%25.$domain&output=json" | \
   jq -r '.[].name_value' | sed 's/\*\.//g' | tee "$outdir/crtsh.txt"
 
-# === Amass (passive) ===
-echo "[+] Running amass passive..."
-amass enum -passive -d "$domain" | tee "$outdir/amass.txt"
-
 # === Combine all & deduplicate ===
 echo "[+] Creating final list..."
-cat "$outdir"/subfinder.txt "$outdir"/crtsh.txt "$outdir"/amass.txt | \
+cat "$outdir"/subfinder.txt "$outdir"/crtsh.txt | \
   sort -u > "$outdir/final_subdomains.txt"
 
 echo "✅ Done! Results in $outdir/final_subdomains.txt"
